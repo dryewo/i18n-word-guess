@@ -21,26 +21,3 @@
 
 ;; -----------------------------------------------------------------------------
 
-
-(defn parse-word [txt]
-  (-> txt
-      (clojure.string/split #"\t")
-      (update-in [1] #(set (clojure.string/split % #"\s")))))
-
-(defn word-seq [file-reader]
-  (->> (line-seq file-reader)
-       (remove empty?)
-       (map parse-word)))
-
-(defn filter-nouns [full-dict]
-  (->> full-dict
-       (filter #(clojure.set/subset? #{"сущ" "ед" "им"} (second %)))
-       (map first)
-       (filter #(not-any? #{\- \space} %))))
-
-(time
- (with-open [rdr (reader (resource "fulldict.txt"))
-             wrtr (writer "nouns.txt")]
-   (binding [*out* wrtr]
-     (doseq [n (filter-nouns (word-seq rdr))]
-       (println n)))))
