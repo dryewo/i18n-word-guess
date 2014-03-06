@@ -1,5 +1,5 @@
 (ns i18n-word-guess.core
-  )
+  (:require [i18n-word-guess.game :as impl]))
 
 (defn -main [& args]
   (println "Hello, World!"))
@@ -14,82 +14,61 @@
   (with-open [rdr (reader file-name)]
     (into [] (line-seq rdr))))
 
-(defn check-guess [code guess]
-  (let [prev-re (re-pattern (clojure.string/replace code #"\d+" #(str "\\D{" % "}")))]
-    (re-seq prev-re guess)))
+(def all-nouns (load-words (resource "nouns.txt")))
+(def nouns (filter #(<= 5 (count %)) all-nouns))
 
-(defn opaque-mask [word]
-  (apply str (repeat (count word) \*)))
+(def game-id-seq (atom 0))
 
-(defn transparent-mask [word]
-  (apply str (repeat (count word) \_)))
+(defn gen-game-id []
+  (swap! game-id-seq inc))
 
-(defn transparent? [mask]
-  (not-any? #{\*} mask))
 
-(defn set-at [string idx chr]
-  (apply str (assoc (vec string) idx chr)))
+(def games (atom {}))
 
-(defn reveal [side mask]
-  (let [edge (case side
-               :front (.indexOf mask "*")
-               :back  (.lastIndexOf mask "*"))]
-    (if (neg? edge)
-      mask
-      (set-at mask edge \_))))
+(defn game-message [{:keys [status guess]}]
+  (case status
+    :start "Начинайте"
+    :ok "Продолжайте"
+    :win "Вы победили"
+    :repeat (str "Вариант \"" guess "\" уже был")
+    :no-match (str "Вариант \"" guess "\" не подходит")
+    :over "Игра закончена"
+    ""))
 
-(defn encode [mask word]
-  {:pre [(= (count mask) (count word))]}
-  (letfn [(apply-mask [m w]
-                      (apply str (map #(if (= %1 \*) \* %2) m w)))
-          (collapse-stars [mw]
-                          (clojure.string/replace mw #"\*+" #(str (count %))))]
-    (->> word
-         (apply-mask mask)
-         collapse-stars)))
+(defn get-game
+  #_([id]
+   (get-game @games id))
+  ([games-snapshot id]
+   (let [game (games-snapshot id)
+         {:keys [code status] :as last-step} (last game)]
+     {:id id :code code :status status :message (game-message last-step)})))
 
-(defn create-game [word]
-  (let [mask (->> (opaque-mask word)
-                  (reveal :front)
-                  (reveal :back))]
-    [{:word word
-      :mask mask
-      :code (encode mask word)}]))
+(defn new-game []
+  (let [game-id (gen-game-id)
+        game (impl/create-game (rand-nth nouns))]
+    (-> (swap! games assoc game-id game)
+        (get-game game-id))))
 
-(defn step
-  ([game new-guess]
-   (step game new-guess (rand-nth [:front :back])))
-  ([game new-guess reveal-side]
-   (let [{:keys [word mask code] :as prev-step} (last game)]
-     (cond
-      (= new-guess word) (conj game {:word word
-                                     :guess new-guess
-                                     :mask (transparent-mask word)
-                                     :code word
-                                     :status :win})
-      (some #{new-guess} (map :guess game)) (conj game {:word word
-                                                        :guess new-guess
-                                                        :mask mask
-                                                        :code code
-                                                        :status :repeat})
-      (check-guess code new-guess) (let [new-mask (reveal reveal-side mask)]
-                                     (conj game {:word word
-                                                 :guess new-guess
-                                                 :mask (if (transparent? new-mask) mask new-mask)
-                                                 :code (encode new-mask word)
-                                                 :status :ok}))
-      :else (conj game {:word word
-                        :guess new-guess
-                        :mask mask
-                        :code code
-                        :status :no-match})))))
+(defn game-guess [game-id new-guess]
+  (if (some #{new-guess} nouns)
+    (-> (swap! games update-in [game-id] impl/step new-guess)
+        (get-game game-id))
+    (merge (get-game @games game-id)
+           {:message (str "Слова \"" new-guess "\" нет в словаре")})))
 
 ;; -----------------------------------------------------------------------------
 
-(def all-nouns (load-words (resource "nouns.txt")))
-(def nouns (filter #(<= 5 (count %)) all-nouns))
+(new-game)
+(get-game @games 17)
+(game-guess 17 "ря")
+
+(@games 17)
+
+;; -----------------------------------------------------------------------------
+
 (count all-nouns)
 (count nouns)
+(some #{"человек"} nouns)
 
 (create-game (rand-nth nouns))
 
