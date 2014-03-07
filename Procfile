@@ -1,0 +1,1 @@
+web: java $JVM_OPTS -cp target/i18n-word-guess-standalone.jar clojure.main -m i18n-word-guess.core $PORT
