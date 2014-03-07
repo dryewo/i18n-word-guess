@@ -9,6 +9,7 @@
                  [metosin/ring-swagger-ui "2.0.10"]
                  [javax.servlet/servlet-api "2.5"]]
   :main ^:skip-aot i18n-word-guess.core
+  :min-lein-version "2.0.0"
   :target-path "target/%s"
   :uberjar-name "i18n-word-guess-standalone.jar"
   :profiles {:uberjar {:aot :all}})
