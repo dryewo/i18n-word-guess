@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" media="screen"
+              href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
+        <!--<link rel="stylesheet"
+              href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css"/>-->
+
+        <script type="text/javascript"
+                src="http://code.jquery.com/jquery-1.9.1.js"></script>
+        <script type="text/javascript"
+                src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript"
+                src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.js"></script>
+
+        <script type="text/javascript">
+
+            var mainModule = angular.module('main', []);
+/*
+            mainModule.controller('PostsCtrl', ['$scope', '$sce', function($scope, $sce) {
+                $scope.to_trusted = function(html_code) {
+                    return $sce.trustAsHtml(html_code);
+                }
+                $scope.posts = [];
+
+//                 setInterval(function () {
+//                     $scope.$apply(function () {$scope.posts.unshift(["Hello", Math.random()])});
+//                 }, 500);
+
+                var on_message = function(event) {
+                    $scope.$apply(function() {
+                        $scope.posts.unshift([new Date, JSON.parse(event.data)["happiness"], "<b>Hello</b>"]);
+                        while ($scope.posts.length > 40)
+                            $scope.posts.pop();
+                    });
+                }
+
+                var open_socket = function() {
+                    var REOPEN_TIMEOUT = 5000;
+                    socket = new WebSocket("ws://localhost:8080/happiness");
+                    socket.onmessage = on_message;
+                    socket.onclose = function(event) {
+                        console.log("Retrying in " + REOPEN_TIMEOUT + " ms");
+                        setTimeout(function() { open_socket(); }, REOPEN_TIMEOUT);
+                    }
+                }
+
+                open_socket();
+            }]);
+*/
+        </script>
+
+        <style type="text/css">
+            .game {
+              max-width: 330px;
+            }
+        </style>
+    </head>
+
+    <body ng-app="main">
+        <div class="container">
+            <div class="game">
+                <h1>Слово угадай игра</h1>
+                <input type="text" class="form-control" autofocus>
+                <br/>
+                <button type="button" class="btn btn-lg btn-success">Йа кнопка</button>
+            </div>
+        </div>
+<!--
+        <div ng-controller="HelloCtrl">
+            Say hello to: <input type="text" ng-model="name">
+            <h1>Hello, {{name}}</h1>
+        </div>
+
+        <ul ng-controller="WorldCtrl">
+            <li ng-repeat="country in countries">
+                {{country.name}} has population of {{country.population}},
+                {{worldsPercentage(country.population)}} % of the World's
+                population
+            </li>
+            <hr>
+            World's population: {{population}} millions
+        </ul>
+
+        <div ng-controller="PostsCtrl">
+            <div ng-repeat="post in posts" class="postbody">
+                <div class="content">{{post[0]}}, {{post[1]}}, <span ng-bind-html="to_trusted(post[2])"/></div>
+            </div>
+        </div>
+-->
+    </body>
+</html>

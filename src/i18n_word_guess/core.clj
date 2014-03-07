@@ -10,20 +10,21 @@
 (defmodel Guess {:word String})
 
 (defapi app
+  compojure.api.middleware/public-resource-routes
   (swagger-ui "/api")
   (swagger-docs)
   (swaggered "i18n-word-guess"
     :description "Слово угадай игра"
     (context "/game" []
-      (GET* "/all" []
-        :summary  "Получить все игры"
-        (ok (run/get-all-games)))
       (GET* "/new" []
         :summary  "Создать новую игру"
         (ok (run/new-game)))
+      (GET* "/all" []
+        :summary  "Получить статусы всех игр"
+        (ok (run/get-all-games)))
       (context "/:game_id" [game_id]
         (GET* "/" []
-          :summary  "Получить игру по ID"
+          :summary  "Получить статус игры по ID"
           (ok (run/get-game game_id)))
         (GET* "/guess" [word]
           :summary  "Попробовать угадать"
