@@ -12,4 +12,5 @@
   :min-lein-version "2.0.0"
   :target-path "target/%s"
   :uberjar-name "i18n-word-guess-standalone.jar"
-  :profiles {:uberjar {:aot :all}})
+  ;:profiles {:uberjar {:aot :all}}
+  )

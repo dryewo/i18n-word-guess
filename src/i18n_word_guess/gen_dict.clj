@@ -1,5 +1,6 @@
 (ns i18n-word-guess.gen-dict
-  (:require [clojure.java.io :as io]))
+  (:require [clojure.java.io :as io]
+            [clojure.set]))
 
 (defn- parse-word [txt]
   (-> txt
