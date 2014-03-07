@@ -1,19 +1,31 @@
 (ns i18n-word-guess.core
   (:require [i18n-word-guess.run :as run]
             [org.httpkit.server]
-            [clojure.java.io :as io]
-            [compojure.core :only [defroutes GET POST]]))
+            [compojure.api.sweet :refer :all]
+            [ring.util.http-response :refer :all]
+            [ring.swagger.schema :refer [defmodel]]
+            [schema.core :as s]
+            [clojure.java.io :as io]))
 
-(defn app [req]
-  {:status  200
-   :headers {"Content-Type" "text/html"}
-   :body    {:text "hello HTTP!"}})
+(defmodel Thingie {:id Long
+                   :hot Boolean
+                   :tag (s/enum :kikka :kukka)})
+
+(defapi app
+  (swagger-ui)
+  (swagger-docs)
+  (swaggered "i18n-word-guess"
+    :description "Word guess game"
+    (context "/game" []
+      (GET* "/new" []
+        :query    [thingie Thingie]
+        :summary  "echos a thingie from query-params"
+        (ok thingie))))) ;; here be coerced thingie
 
 (defn -main [& args]
   (let [port (or (first args) 3030)]
     (println "Starting on port" port)
     (org.httpkit.server/run-server app {:port (bigdec port)})))
-
 
 
 #_(
