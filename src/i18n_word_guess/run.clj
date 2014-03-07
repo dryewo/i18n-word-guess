@@ -8,7 +8,7 @@
 (def game-id-seq (atom 0))
 
 (defn gen-game-id []
-  (swap! game-id-seq inc))
+  (str (swap! game-id-seq inc)))
 
 ;;-----------------------------------------------------------------------------
 ;; Dictionary
@@ -35,13 +35,21 @@
     :over "Игра закончена"
     ""))
 
+(defn format-game [id game]
+  (let [{:keys [code status] :as last-step} (last game)]
+    {:id id :code code :status status :message (game-message last-step)}))
+
 (defn get-game
-  #_([id]
+  ([id]
    (get-game @games id))
   ([games-snapshot id]
-   (let [game (games-snapshot id)
-         {:keys [code status] :as last-step} (last game)]
-     {:id id :code code :status status :message (game-message last-step)})))
+   (format-game id (games-snapshot id))))
+
+(defn get-all-games
+  ([]
+   (get-all-games @games))
+  ([games-snapshot]
+   (map #(format-game (key %) (val %)) @games)))
 
 (defn new-game []
   (let [game-id (gen-game-id)

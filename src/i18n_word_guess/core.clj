@@ -7,20 +7,25 @@
             [schema.core :as s]
             [clojure.java.io :as io]))
 
-(defmodel Thingie {:id Long
+#_(defmodel Thingie {:id Long
                    :hot Boolean
                    :tag (s/enum :kikka :kukka)})
 
 (defapi app
-  (swagger-ui)
+  (swagger-ui "/api")
   (swagger-docs)
   (swaggered "i18n-word-guess"
-    :description "Word guess game"
+    :description "Слово угадай игра"
     (context "/game" []
+      (GET* "/all" []
+        :summary  "Получить все игры"
+        (ok (run/get-all-games)))
       (GET* "/new" []
-        :query    [thingie Thingie]
-        :summary  "echos a thingie from query-params"
-        (ok thingie))))) ;; here be coerced thingie
+        :summary  "Создать новую игру"
+        (ok (run/new-game)))
+      (GET* "/:game_id" [game_id]
+        :summary  "Получить игру по ID"
+        (ok (run/get-game game_id))))))
 
 (defn -main [& args]
   (let [port (or (first args) 3030)]
@@ -31,11 +36,15 @@
 #_(
 ;; -----------------------------------------------------------------------------
 
-(new-game)
-(get-game @games 17)
-(game-guess 17 "ря")
+(run/new-game)
+(run/get-game 2)
+(run/get-all-games)
 
-(@games 17)
+(run/game-guess 1 "резерв")
+
+ @run/games
+
+(run/get-all-games)
 
 ;; -----------------------------------------------------------------------------
 
