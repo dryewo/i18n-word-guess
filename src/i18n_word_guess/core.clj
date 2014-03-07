@@ -7,9 +7,7 @@
             [schema.core :as s]
             [clojure.java.io :as io]))
 
-#_(defmodel Thingie {:id Long
-                   :hot Boolean
-                   :tag (s/enum :kikka :kukka)})
+(defmodel Guess {:word String})
 
 (defapi app
   (swagger-ui "/api")
@@ -23,9 +21,14 @@
       (GET* "/new" []
         :summary  "Создать новую игру"
         (ok (run/new-game)))
-      (GET* "/:game_id" [game_id]
-        :summary  "Получить игру по ID"
-        (ok (run/get-game game_id))))))
+      (context "/:game_id" [game_id]
+        (GET* "/" []
+          :summary  "Получить игру по ID"
+          (ok (run/get-game game_id)))
+        (GET* "/guess" [word]
+          :summary  "Попробовать угадать"
+          :query [guess Guess]
+          (ok (run/guess-game game_id word)))))))
 
 (defn -main [& args]
   (let [port (or (first args) 3030)]

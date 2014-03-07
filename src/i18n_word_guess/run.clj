@@ -13,7 +13,7 @@
 ;;-----------------------------------------------------------------------------
 ;; Dictionary
 
-(defn load-words [file-name]
+(defn- load-words [file-name]
   (with-open [rdr (io/reader file-name)]
     (into [] (line-seq rdr))))
 
@@ -25,19 +25,21 @@
 
 (def games (atom {}))
 
-(defn game-message [{:keys [status guess]}]
+(defn- game-message [{:keys [status guess]}]
   (case status
     :start "Начинайте"
     :ok "Продолжайте"
     :win "Вы победили"
     :repeat (str "Вариант \"" guess "\" уже был")
     :no-match (str "Вариант \"" guess "\" не подходит")
-    :over "Игра закончена"
+    :over "Игра уже закончена"
     ""))
 
 (defn format-game [id game]
-  (let [{:keys [code status] :as last-step} (last game)]
-    {:id id :code code :status status :message (game-message last-step)}))
+  (let [last-step (last game)]
+    (merge (select-keys last-step [:code :status :timestamp])
+           {:id id
+            :message (game-message last-step)})))
 
 (defn get-game
   ([id]
@@ -57,7 +59,7 @@
     (-> (swap! games assoc game-id game)
         (get-game game-id))))
 
-(defn game-guess [game-id new-guess]
+(defn guess-game [game-id new-guess]
   (if (some #{new-guess} nouns)
     (-> (swap! games update-in [game-id] impl/step new-guess)
         (get-game game-id))

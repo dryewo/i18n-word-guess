@@ -38,7 +38,8 @@
   (let [mask (->> (opaque-mask word)
                   (reveal :front)
                   (reveal :back))]
-    [{:word word
+    [{:timestamp (java.util.Date.)
+      :word word
       :mask mask
       :code (encode mask word)
       :status :start}]))
@@ -48,25 +49,29 @@
    (step game new-guess (rand-nth [:front :back])))
   ([game new-guess reveal-side]
    (let [{:keys [word mask code status] :as prev-step} (last game)]
-     (cond
-      (= new-guess word) (conj game {:word word
-                                     :guess new-guess
-                                     :mask (transparent-mask word)
-                                     :code word
-                                     :status (if (= status :win) :over :win)})
-      (some #{new-guess} (map :guess game)) (conj game {:word word
-                                                        :guess new-guess
-                                                        :mask mask
-                                                        :code code
-                                                        :status :repeat})
-      (check-guess code new-guess) (let [new-mask (reveal reveal-side mask)]
-                                     (conj game {:word word
-                                                 :guess new-guess
-                                                 :mask (if (transparent? new-mask) mask new-mask)
-                                                 :code (encode new-mask word)
-                                                 :status :ok}))
-      :else (conj game {:word word
-                        :guess new-guess
-                        :mask mask
-                        :code code
-                        :status :no-match})))))
+     (conj game
+           (merge {:timestamp (java.util.Date.)
+                   :word word
+                   :guess new-guess}
+                  (cond
+                   (= new-guess word) {:mask (transparent-mask word)
+                                       :code word
+                                       :status (if (= status :win) :over :win)}
+                   (some #{new-guess} (map :guess game)) {:mask mask
+                                                          :code code
+                                                          :status :repeat}
+                   (check-guess code new-guess) (let [new-mask (reveal reveal-side mask)
+                                                      new-mask (if (transparent? new-mask) mask new-mask)]
+                                                  {:mask new-mask
+                                                   :code (encode new-mask word)
+                                                   :status :ok})
+                   :else {:mask mask
+                          :code code
+                          :status :no-match}))))))
+
+#_(
+(-> (create-game "пайка")
+    (step "почка" :front)
+    (step "палка" :back)
+    (step "папка"))
+)
