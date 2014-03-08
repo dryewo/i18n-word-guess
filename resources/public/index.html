@@ -21,7 +21,9 @@
                 $scope.curGuess = "";
 
                 $scope.guess = function(word) {
-                    $http.get('http://localhost:3030/game/' + $scope.curGame.id + '/guess?word=' + word)
+                    if (!word)
+                        return;
+                    $http.get('/game/' + $scope.curGame.id + '/guess?word=' + word)
                         .success(function(data, status, headers, config) {
                             $scope.curGame = data;
                         })
@@ -30,7 +32,7 @@
                 }
 
                 $scope.newGame = function() {
-                    $http.get('http://localhost:3030/games/new')
+                    $http.get('/games/new')
                         .success(function(data, status, headers, config) {
                             $scope.curGame = data;
                         })
