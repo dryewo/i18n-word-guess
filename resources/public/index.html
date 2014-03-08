@@ -3,8 +3,6 @@
     <head>
         <link rel="stylesheet" media="screen"
               href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
-        <!--<link rel="stylesheet"
-              href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css"/>-->
 
         <script type="text/javascript"
                 src="http://code.jquery.com/jquery-1.9.1.js"></script>
@@ -16,38 +14,32 @@
         <script type="text/javascript">
 
             var mainModule = angular.module('main', []);
-/*
-            mainModule.controller('PostsCtrl', ['$scope', '$sce', function($scope, $sce) {
-                $scope.to_trusted = function(html_code) {
-                    return $sce.trustAsHtml(html_code);
-                }
-                $scope.posts = [];
 
-//                 setInterval(function () {
-//                     $scope.$apply(function () {$scope.posts.unshift(["Hello", Math.random()])});
-//                 }, 500);
+            mainModule.controller('GameCtrl', ['$scope', '$http', function($scope, $http) {
+                $scope.curGame = {};
+                $scope.curGuess = "";
 
-                var on_message = function(event) {
-                    $scope.$apply(function() {
-                        $scope.posts.unshift([new Date, JSON.parse(event.data)["happiness"], "<b>Hello</b>"]);
-                        while ($scope.posts.length > 40)
-                            $scope.posts.pop();
-                    });
+                $scope.guess = function(word) {
+                    $http.get('http://localhost:3030/game/' + $scope.curGame.id + '/guess?word=' + word)
+                        .success(function(data, status, headers, config) {
+                            $scope.curGame = data;
+                        })
+                        .error(function(data, status, headers, config) {
+                            console.log(status + ': ' + data);});
                 }
 
-                var open_socket = function() {
-                    var REOPEN_TIMEOUT = 5000;
-                    socket = new WebSocket("ws://localhost:8080/happiness");
-                    socket.onmessage = on_message;
-                    socket.onclose = function(event) {
-                        console.log("Retrying in " + REOPEN_TIMEOUT + " ms");
-                        setTimeout(function() { open_socket(); }, REOPEN_TIMEOUT);
-                    }
+                $scope.newGame = function() {
+                    $http.get('http://localhost:3030/games/new')
+                        .success(function(data, status, headers, config) {
+                            $scope.curGame = data;
+                        })
+                        .error(function(data, status, headers, config) {
+                            console.log(status + ': ' + data);});
                 }
 
-                open_socket();
+                $scope.newGame();
             }]);
-*/
+
         </script>
 
         <style type="text/css">
@@ -59,34 +51,15 @@
 
     <body ng-app="main">
         <div class="container">
-            <div class="game">
-                <h1>Слово угадай игра</h1>
-                <input type="text" class="form-control" autofocus>
+            <div class="game" ng-controller="GameCtrl">
+                <h2 class="text-center">Слово угадай игра</h2>
+                <h1 class="text-center">{{curGame.code}}</h1>
+                <input type="text" class="form-control input-lg" autofocus ng-model="curGuess">
                 <br/>
-                <button type="button" class="btn btn-lg btn-success">Йа кнопка</button>
+                <button type="button" class="btn btn-lg btn-success btn-block" ng-click="guess(curGuess)">Йа кнопка</button>
+                <br/>
+                <h4>{{curGame.message}}</h4>
             </div>
         </div>
-<!--
-        <div ng-controller="HelloCtrl">
-            Say hello to: <input type="text" ng-model="name">
-            <h1>Hello, {{name}}</h1>
-        </div>
-
-        <ul ng-controller="WorldCtrl">
-            <li ng-repeat="country in countries">
-                {{country.name}} has population of {{country.population}},
-                {{worldsPercentage(country.population)}} % of the World's
-                population
-            </li>
-            <hr>
-            World's population: {{population}} millions
-        </ul>
-
-        <div ng-controller="PostsCtrl">
-            <div ng-repeat="post in posts" class="postbody">
-                <div class="content">{{post[0]}}, {{post[1]}}, <span ng-bind-html="to_trusted(post[2])"/></div>
-            </div>
-        </div>
--->
     </body>
 </html>
