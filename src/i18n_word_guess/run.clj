@@ -17,8 +17,13 @@
   (with-open [rdr (io/reader file-name)]
     (into [] (line-seq rdr))))
 
-(def all-nouns (load-words (io/resource "nouns.txt")))
-(def nouns (filter #(<= 5 (count %)) all-nouns))
+(def questionable-nouns (filter #(<= 5 (count %))
+                   (load-words (io/resource "nouns.txt"))))
+
+(def all-nouns (load-words (io/resource "nouns-full.txt")))
+
+;(count questionable-nouns)
+;(count all-nouns)
 
 ;;-----------------------------------------------------------------------------
 ;; Game routine
@@ -55,12 +60,12 @@
 
 (defn new-game []
   (let [game-id (gen-game-id)
-        game (impl/create-game (rand-nth nouns))]
+        game (impl/create-game (rand-nth questionable-nouns))]
     (-> (swap! games assoc game-id game)
         (get-game game-id))))
 
 (defn guess-game [game-id new-guess]
-  (if (some #{new-guess} nouns)
+  (if (some #{new-guess} all-nouns)
     (-> (swap! games update-in [game-id] impl/step new-guess)
         (get-game game-id))
     (merge (get-game @games game-id)
