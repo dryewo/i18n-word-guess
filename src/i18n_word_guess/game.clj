@@ -44,10 +44,10 @@
                   (reveal :front)
                   (reveal :back))]
     [{:timestamp (java.util.Date.)
-      :word word
-      :mask mask
-      :code (encode mask word)
-      :status :start}]))
+      :word      word
+      :mask      mask
+      :code      (encode mask word)
+      :status    :start}]))
 
 (defn step
   ([game new-guess]
@@ -55,24 +55,24 @@
   ([game new-guess reveal-side]
    (let [{:keys [word mask code status] :as prev-step} (last game)]
      (conj game
-           (merge {:timestamp (java.util.Date.)
-                   :word word
-                   :guess new-guess}
+           (merge {:word      word
+                   :guess     new-guess
+                   :timestamp (java.util.Date.)}
                   (cond
-                   (= new-guess word) {:mask (transparent-mask word)
-                                       :code word
-                                       :status (if (= status :win) :over :win)}
-                   (some #{new-guess} (map :guess game)) {:mask mask
-                                                          :code code
-                                                          :status :repeat}
+                   (= new-guess word) {:status (if (= status :win) :over :win)
+                                       :mask   (transparent-mask word)
+                                       :code   word}
+                   (some #{new-guess} (map :guess game)) {:status :repeat
+                                                          :mask   mask
+                                                          :code   code}
                    (check-guess code new-guess) (let [new-mask (reveal reveal-side mask)
                                                       new-mask (if (transparent? new-mask) mask new-mask)]
-                                                  {:mask new-mask
-                                                   :code (encode new-mask word)
-                                                   :status :ok})
-                   :else {:mask mask
-                          :code code
-                          :status :no-match}))))))
+                                                  {:status :ok
+                                                   :mask   new-mask
+                                                   :code   (encode new-mask word)})
+                   :else {:status :no-match
+                          :mask   mask
+                          :code   code}))))))
 
 ;;-----------------------------------------------------------------------------
 ;; Hints
