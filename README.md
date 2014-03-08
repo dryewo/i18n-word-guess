@@ -1,36 +1,15 @@
 # i18n-word-guess
 
-FIXME: description
-
-## Installation
-
-Download from http://example.com/FIXME.
+Word guessing game
 
 ## Usage
 
-FIXME: explanation
+[http://i18n-word-guess.herokuapp.com/](http://i18n-word-guess.herokuapp.com/)
 
-    $ java -jar i18n-word-guess-0.1.0-standalone.jar [args]
+## API
 
-## Options
-
-FIXME: listing of options this app accepts.
-
-## Examples
-
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
+[http://i18n-word-guess.herokuapp.com/api](http://i18n-word-guess.herokuapp.com/api)
 
 ## License
 
-Copyright © 2014 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Copyright © 2014 Dmitry Balakhonskiy
