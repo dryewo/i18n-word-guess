@@ -7,7 +7,8 @@
             [schema.core :as s]
             [clojure.java.io :as io]))
 
-(defmodel Guess {:word String})
+(defmodel Guess   {:word String})
+(defmodel GetHint {:code String})
 
 (defn wrap-cache-control [handler]
   (fn [request]
@@ -35,7 +36,11 @@
                         (GET* "/guess" [word]
                               :summary  "Попробовать угадать"
                               :query [guess Guess]
-                              (ok (run/guess-game game_id word)))))))
+                              (ok (run/guess-game game_id word))))
+               (GET* "/hints" [code]
+                     :summary  "Получить подсказку"
+                     :query [getHint GetHint]
+                     (ok (run/get-hints code))))))
 
 (defn -main [& args]
   (let [port (or (first args) 3030)]

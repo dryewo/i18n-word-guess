@@ -17,7 +17,7 @@
   (with-open [rdr (io/reader file-name)]
     (into [] (line-seq rdr))))
 
-(def questionable-nouns (filter #(<= 5 (count %))
+(def questionable-nouns (filter #(<= 5 (count %) 10)
                    (load-words (io/resource "nouns.txt"))))
 
 (def all-nouns (load-words (io/resource "nouns-full.txt")))
@@ -71,3 +71,8 @@
           (get-game game-id))
       (merge (get-game @games game-id)
              {:message (str "Слова \"" new-guess "\" нет в словаре")}))))
+
+(defn get-hints [code]
+  (impl/code-hints all-nouns code))
+
+;; (distinct (map impl/word->phon questionable-nouns))

@@ -1,7 +1,12 @@
 (ns i18n-word-guess.game)
 
+(defn- code->re [code]
+  (re-pattern (str "^"
+                   (clojure.string/replace code #"\d+" #(str "\\D{" % "}"))
+                   "$")))
+
 (defn- check-guess [code guess]
-  (let [prev-re (re-pattern (clojure.string/replace code #"\d+" #(str "\\D{" % "}")))]
+  (let [prev-re (code->re code)]
     (re-seq prev-re guess)))
 
 (defn- opaque-mask [word]
@@ -69,9 +74,41 @@
                           :code code
                           :status :no-match}))))))
 
-#_(
-(-> (create-game "пайка")
-    (step "почка" :front)
-    (step "палка" :back)
-    (step "папка"))
-)
+;;-----------------------------------------------------------------------------
+;; Hints
+
+(def vowels (into #{} "аеиоуыэюя"))
+
+(defn- char-phon-class [c]
+  (if (contains? vowels c) :vowel :consonant))
+
+(defn- encode-hint [idx char-seq]
+  (case (char-phon-class (first char-seq))
+    :vowel (case (count char-seq)
+             1 "A"
+             2 "AO"
+             3 "UAO")
+    :consonant (case (count char-seq)
+                 1 "T"
+                 2 (if (pos? idx) "RT" "TR")
+                 3 "RTK"
+                 4 "RNTK"
+                 5 "FRNTK"
+                 6 "PFRNTK")))
+
+
+;; загвоздка -> TARTARTKA
+;; баобаб -> TAOTAT
+;; коэффициент -> TAORTATAORT
+
+(defn word->phon [^String word]
+  (->> (partition-by char-phon-class word)
+       (map-indexed encode-hint)
+       flatten
+       (apply str)))
+
+(defn code-hints [dict code]
+  (->> dict
+       (filter #(re-seq (code->re code) %))
+       (map word->phon)
+       distinct))
