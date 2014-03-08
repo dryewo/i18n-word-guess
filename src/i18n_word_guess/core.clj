@@ -42,24 +42,3 @@
   (let [port (or (first args) 3030)]
     (println "Starting on port" port)
     (org.httpkit.server/run-server app {:port (bigdec port)})))
-
-#_(
-;; -----------------------------------------------------------------------------
-
-(run/new-game)
-(run/get-game 2)
-(run/get-all-games)
-
-(run/game-guess 1 "резерв")
-
- @run/games
-
-(run/get-all-games)
-
-;; -----------------------------------------------------------------------------
-
-(count all-nouns)
-(count nouns)
-(some #{"человек"} nouns)
-
-)

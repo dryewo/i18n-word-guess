@@ -8,3 +8,4 @@ pom.xml.asc
 /.lein-*
 /.nrepl-port
 /resources/fulldict.txt
+/src/i18n_word_guess/repl.clj
