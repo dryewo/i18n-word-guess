@@ -91,7 +91,7 @@
     :consonant (case (count char-seq)
                  1 "T"
                  2 (if (pos? idx) "RT" "TR")
-                 3 "RTK"
+                 3 "STR"
                  4 "RNTK"
                  5 "FRNTK"
                  6 "PFRNTK")))

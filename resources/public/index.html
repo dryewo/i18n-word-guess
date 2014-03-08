@@ -31,6 +31,15 @@
                             console.log(status + ': ' + data);});
                 }
 
+                $scope.hints = function() {
+                    $http.get('/hints?code=' + $scope.curGame.code)
+                        .success(function(data, status, headers, config) {
+                            $scope.curGame.hints = data;
+                        })
+                        .error(function(data, status, headers, config) {
+                            console.log(status + ': ' + data);});
+                }
+
                 $scope.newGame = function() {
                     $http.get('/games/new')
                         .success(function(data, status, headers, config) {
@@ -44,29 +53,43 @@
             }]);
 
         </script>
-
-        <style type="text/css">
-            .game {
-              max-width: 330px;
-            }
-        </style>
     </head>
 
     <body ng-app="main">
-        <div class="container">
-            <div class="game" ng-controller="GameCtrl">
-                <h2 class="text-center">Слово угадай игра</h2>
-                <h1 class="text-center">{{curGame.code}}</h1>
-                <input type="text" class="form-control input-lg" autofocus ng-model="curGuess">
-                <br/>
-                <h4>{{curGame.message}}</h4>
-                <br/>
-                <button type="button" class="btn btn-lg btn-success btn-block" ng-click="guess(curGuess)">Йа кнопка</button>
-                <h2>Правила</h2>
-                <p>Слово зашифровано: указаны первая и последняя буквы, а также количество букв между ними.</p>
-                <p>Попытайтесь отгадать исходное слово, предлагая подходящие под код варианты.</p>
-                <p>После каждой успешной попытки будет открыта еще одна буква.<p/>
-                <p>Начать новую игру — <b>F5</b>.<p/>
+        <div class="container" ng-controller="GameCtrl">
+            <div class="row">
+                <h1>Слово угадай игра</h1>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <h2 class="text-center">{{curGame.code}}</h1>
+                    <input type="text" class="form-control input-lg" autofocus ng-model="curGuess">
+                    <br/>
+                    <h4>{{curGame.message}}</h4>
+                    <br/>
+                    <table>
+                        <tr>
+                            <td width="100%">
+                                <button type="button" class="btn btn-lg btn-success btn-block" ng-click="guess(curGuess)">Отгадать</button></td>
+                            <td style="padding-left: 15px">
+                                <button type="button" class="btn btn-warning btn-lg" ng-click="hints()"><span class="glyphicon glyphicon-fire"/></button></td>
+                        </tr>
+                    </table>
+                    <br/>
+                    <div ng-show="curGame.hints.length > 0">
+                        <p>Фонетические подсказки:</p>
+                        <ul>
+                            <li ng-repeat="hint in curGame.hints">{{hint}}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <h3>Правила</h3>
+                    <p>Слово зашифровано: указаны первая и последняя буквы, а также количество букв между ними.</p>
+                    <p>Попытайтесь отгадать исходное слово, предлагая подходящие под код варианты.</p>
+                    <p>После каждой успешной попытки будет открыта еще одна буква.<p/>
+                    <p>Начать новую игру — <b>F5</b>.<p/>
+                </div>
             </div>
         </div>
     </body>
