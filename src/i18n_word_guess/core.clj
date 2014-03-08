@@ -34,10 +34,10 @@
                         (GET* "/" []
                               :summary  "Получить статус игры по ID"
                               (ok (run/get-game game_id)))
-                        (GET* "/guess" [word]
+                        (POST* "/guess" []
                               :summary  "Попробовать угадать"
-                              :query [guess Guess]
-                              (ok (run/guess-game game_id word))))
+                              :body [guess Guess]
+                              (ok (run/guess-game game_id (:word guess)))))
                (GET* "/hints" [code]
                      :summary  "Получить подсказку"
                      :query [getHint GetHint]

@@ -27,7 +27,7 @@
                 $scope.guess = function(word) {
                     if (!word)
                         return;
-                    $http.get('/game/' + $scope.curGame.id + '/guess?word=' + word)
+                    $http.post('/game/' + $scope.curGame.id + '/guess', {"word": word})
                         .success(function(data, status, headers, config) {
                             $scope.curGame = data;
                         })
