@@ -16,10 +16,11 @@
       (assoc-in response [:headers "Cache-control"] "no-cache"))))
 
 (defapi app
-  compojure.api.middleware/public-resource-routes
   (swagger-ui "/api")
   (swagger-docs)
   (with-middleware [wrap-cache-control]
+    (GET* "/" []
+         (resource-response "index.html" {:root "public"}))
     (swaggered "i18n-word-guess"
                :description "Слово угадай игра"
                (context "/games" []
