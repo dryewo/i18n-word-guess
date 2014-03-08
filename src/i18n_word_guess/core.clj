@@ -11,9 +11,8 @@
 
 (defn wrap-cache-control [handler]
   (fn [request]
-    (let [resp (handler request)
-          headers (:headers resp)]
-      (assoc-in resp [:headers "Cache-control"] "no-cache"))))
+    (let [response (handler request)]
+      (assoc-in response [:headers "Cache-control"] "no-cache"))))
 
 (defapi app
   compojure.api.middleware/public-resource-routes

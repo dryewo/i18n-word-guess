@@ -65,8 +65,9 @@
         (get-game game-id))))
 
 (defn guess-game [game-id new-guess]
-  (if (some #{new-guess} all-nouns)
-    (-> (swap! games update-in [game-id] impl/step new-guess)
-        (get-game game-id))
-    (merge (get-game @games game-id)
-           {:message (str "Слова \"" new-guess "\" нет в словаре")})))
+  (let [lower-guess (clojure.string/lower-case new-guess)]
+    (if (some #{lower-guess} all-nouns)
+      (-> (swap! games update-in [game-id] impl/step lower-guess)
+          (get-game game-id))
+      (merge (get-game @games game-id)
+             {:message (str "Слова \"" new-guess "\" нет в словаре")}))))
