@@ -23,7 +23,7 @@
 
 (defn- reveal [side mask]
   (let [edge (case side
-               :front (.indexOf mask "*")
+               :front (.indexOf     mask "*")
                :back  (.lastIndexOf mask "*"))]
     (if (neg? edge)
       mask
