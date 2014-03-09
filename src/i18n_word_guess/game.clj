@@ -59,7 +59,7 @@
                    :guess     new-guess
                    :timestamp (java.util.Date.)}
                   (cond
-                   (= new-guess word) {:status (if (= status :win) :over :win)
+                   (= new-guess word) {:status (if (#{:win :over} status) :over :win)
                                        :mask   (transparent-mask word)
                                        :code   word}
                    (some #{new-guess} (map :guess game)) {:status :repeat

@@ -25,6 +25,21 @@
                 $scope.curGuess = "";
                 $scope.guessLoading = false;
                 $scope.hintsLoading = false;
+                
+                $scope.isGameOver = function() {
+                    with ($scope) {
+                        return curGame.status == 'win' || curGame.status == 'over';
+                    }
+                }
+                
+                $scope.submit = function() {
+                    with ($scope) {
+                        if (isGameOver())
+                            newGame();
+                        else
+                            guess(curGuess);
+                    }
+                }
 
                 $scope.guess = function(word) {
                     if (!word)
@@ -34,6 +49,7 @@
                     $http.post('/game/' + $scope.curGame.id + '/guess', {"word": word})
                         .success(function(data, status, headers, config) {
                             $scope.curGame = data;
+                            $scope.curGuess = "";
                             $scope.guessLoading = false;
                         })
                         .error(function(data, status, headers, config) {
@@ -60,6 +76,7 @@
                 }
 
                 $scope.newGame = function() {
+                    $scope.curGuess = "";
                     $http.get('/games/new')
                         .success(function(data, status, headers, config) {
                             $scope.curGame = data;
@@ -88,7 +105,7 @@
             </div>
             <div class="row">
                 <div class="col-sm-6 col-md-4">
-                    <form ng-submit="guess(curGuess)">
+                    <form ng-submit="submit()">
                         <h2 class="text-center">{{curGame.code}}</h2>
                         <input type="text" class="form-control input-lg" autofocus ng-model="curGuess"
                             ng-class="{'input-loading': guessLoading}"/>
@@ -98,7 +115,7 @@
                         <table>
                             <tr>
                                 <td width="100%">
-                                    <button type="submit" class="btn btn-lg btn-success btn-block">Отгадать</button></td>
+                                    <button type="submit" class="btn btn-lg btn-success btn-block">{{isGameOver() ? 'Новая игра' : 'Отгадать'}}</button></td>
                                 <td style="padding-left: 15px">
                                     <button type="button" class="btn btn-warning btn-lg" ng-click="hints()"><span class="glyphicon glyphicon-fire"/></button></td>
                             </tr>
@@ -117,8 +134,9 @@
                     <h2>Правила</h2>
                     <p>Слово зашифровано: указаны первая и последняя буквы, а также количество букв между ними.</p>
                     <p>Попытайтесь отгадать исходное слово, предлагая подходящие под код варианты.</p>
+                    <p>Для удобства отправки можно использовать <b>Enter</b>.</p>
                     <p>После каждой успешной попытки будет открыта еще одна буква.<p/>
-                    <p>Начать новую игру — <b>F5</b>.<p/>
+                    <p>Начать новую игру можно также нажатием <b>F5</b>.<p/>
                 </div>
             </div>
         </div>
