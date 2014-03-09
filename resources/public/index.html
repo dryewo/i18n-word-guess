@@ -15,6 +15,7 @@
                 src="https://www.google.com/jsapi"></script>
         <script type="text/javascript"
                 src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"></script>
+
         <script type="text/javascript">
 
             var mainModule = angular.module('main', []);
@@ -22,25 +23,40 @@
             mainModule.controller('GameCtrl', ['$scope', '$http', function($scope, $http) {
                 $scope.curGame = {};
                 $scope.curGuess = "";
+                $scope.guessLoading = false;
+                $scope.hintsLoading = false;
 
                 $scope.guess = function(word) {
                     if (!word)
                         return;
+                    $scope.guessLoading = true;
+                    //setTimeout(function () {
                     $http.post('/game/' + $scope.curGame.id + '/guess', {"word": word})
                         .success(function(data, status, headers, config) {
                             $scope.curGame = data;
+                            $scope.guessLoading = false;
                         })
                         .error(function(data, status, headers, config) {
-                            console.log(status + ': ' + data);});
+                            console.log(status + ': ' + data);
+                            $scope.guessLoading = false;
+                        });
+                    //}, 1000);
                 }
 
                 $scope.hints = function() {
+                    $scope.curGame.hints = {};
+                    $scope.hintsLoading = true;
+                    //setTimeout(function () {
                     $http.get('/hints?code=' + $scope.curGame.code)
                         .success(function(data, status, headers, config) {
                             $scope.curGame.hints = data;
+                            $scope.hintsLoading = false;
                         })
                         .error(function(data, status, headers, config) {
-                            console.log(status + ': ' + data);});
+                            console.log(status + ': ' + data);
+                            $scope.hintsLoading = false;
+                        });
+                    //}, 1000);
                 }
 
                 $scope.newGame = function() {
@@ -56,6 +72,11 @@
             }]);
 
         </script>
+        <style type="text/css">
+            .input-loading {
+                background: url('assets/loading.gif') no-repeat right 10px center;
+            }
+        </style>
     </head>
 
     <body ng-app="main">
@@ -68,8 +89,9 @@
             <div class="row">
                 <div class="col-sm-6 col-md-4">
                     <form ng-submit="guess(curGuess)">
-                        <h2 class="text-center">{{curGame.code}}</h1>
-                        <input type="text" class="form-control input-lg" autofocus ng-model="curGuess">
+                        <h2 class="text-center">{{curGame.code}}</h2>
+                        <input type="text" class="form-control input-lg" autofocus ng-model="curGuess"
+                            ng-class="{'input-loading': guessLoading}"/>
                         <br/>
                         <h4>{{curGame.message}}</h4>
                         <br/>
@@ -82,6 +104,7 @@
                             </tr>
                         </table>
                         <br/>
+                        <img src="assets/loading.gif" alt="loading..." ng-show="hintsLoading"/>
                         <div ng-show="curGame.hints.length > 0">
                             <p>Фонетические подсказки:</p>
                             <ul>

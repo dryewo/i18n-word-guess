@@ -43,7 +43,7 @@
                      :summary  "Получить подсказку"
                      :query [getHint GetHint]
                      (ok (run/get-hints code))))
-    ;compojure.api.middleware/public-resource-routes
+    compojure.api.middleware/public-resource-routes
     (compojure.route/not-found "<h1>NO.</h1>")))
 
 (defn -main [& args]
