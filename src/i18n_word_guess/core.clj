@@ -1,4 +1,5 @@
 (ns i18n-word-guess.core
+  (:gen-class)
   (:require [i18n-word-guess.run :as run]
             [org.httpkit.server]
             [compojure.api.sweet :refer :all]
@@ -6,7 +7,10 @@
                                              resource-response]]
             [ring.swagger.schema :refer [defmodel]]
             [schema.core :as s]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [taoensso.timbre :as log]))
+
+(log/merge-config! {:timestamp-pattern "yyyy-MM-dd HH:mm:ss ZZ"})
 
 (defmodel Guess   {:word String})
 (defmodel GetHint {:code String})
@@ -16,10 +20,23 @@
     (let [response (handler request)]
       (assoc-in response [:headers "Cache-control"] "no-cache"))))
 
+(defn wrap-log [handler]
+  (fn [request]
+    (let [req-id (apply str (take 4 (repeatedly #(rand-nth "ABCDEF0123456789"))))]
+      (log/info req-id
+                (->> (:request-method request) name clojure.string/upper-case)
+                (:uri request)
+                (:params request))
+      (let [response (handler request)]
+        (log/info req-id
+                  (:status response)
+                  (:body response))
+        response))))
+
 (defapi app
   (swagger-ui "/api")
   (swagger-docs)
-  (with-middleware [wrap-cache-control]
+  (with-middleware [wrap-log wrap-cache-control]
     (GET* "/" []
           (resource-response "index.html" {:root "public"}))
     (swaggered "i18n-word-guess"
