@@ -2,19 +2,19 @@
 <html>
     <head>
         <meta charset="utf-8">
-		<meta http-equiv="cache-control" content="no-cache" />
-		
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="cache-control" content="no-cache" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" media="screen"
               href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
 
         <script type="text/javascript"
-                src="http://code.jquery.com/jquery-1.9.1.js"></script>
+                src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script type="text/javascript"
                 src="https://www.google.com/jsapi"></script>
         <script type="text/javascript"
-                src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.js"></script>
+                src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"></script>
 
         <script type="text/javascript">
 
@@ -62,12 +62,12 @@
     <body ng-app="main">
         <div class="container" ng-controller="GameCtrl">
             <div class="row">
-				<div class="col-md-4">
-					<h2 class="text-center">Слово угадай игра</h1>
-				</div>
+                <div class="col-sm-6 col-md-4">
+                    <h2 class="text-center">Слово угадай игра</h1>
+                </div>
             </div>
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-sm-6 col-md-4">
                     <h2 class="text-center">{{curGame.code}}</h1>
                     <input type="text" class="form-control input-lg" autofocus ng-model="curGuess">
                     <br/>
@@ -89,7 +89,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-md-8">
+                <div class="col-sm-6 col-md-8">
                     <h2>Правила</h2>
                     <p>Слово зашифровано: указаны первая и последняя буквы, а также количество букв между ними.</p>
                     <p>Попытайтесь отгадать исходное слово, предлагая подходящие под код варианты.</p>
