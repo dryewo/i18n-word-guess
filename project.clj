@@ -7,6 +7,7 @@
                  [http-kit "2.1.17"]
                  [metosin/compojure-api "0.8.1"]
                  [metosin/ring-swagger-ui "2.0.10"]
+                 [ring-mock "0.1.5"]
                  [javax.servlet/servlet-api "2.5"]]
   :main ^:skip-aot i18n-word-guess.core
   :min-lein-version "2.0.0"

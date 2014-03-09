@@ -7,7 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" media="screen"
-              href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
+            href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
 
         <script type="text/javascript"
                 src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
@@ -15,7 +15,6 @@
                 src="https://www.google.com/jsapi"></script>
         <script type="text/javascript"
                 src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"></script>
-
         <script type="text/javascript">
 
             var mainModule = angular.module('main', []);
@@ -68,26 +67,28 @@
             </div>
             <div class="row">
                 <div class="col-sm-6 col-md-4">
-                    <h2 class="text-center">{{curGame.code}}</h1>
-                    <input type="text" class="form-control input-lg" autofocus ng-model="curGuess">
-                    <br/>
-                    <h4>{{curGame.message}}</h4>
-                    <br/>
-                    <table>
-                        <tr>
-                            <td width="100%">
-                                <button type="button" class="btn btn-lg btn-success btn-block" ng-click="guess(curGuess)">Отгадать</button></td>
-                            <td style="padding-left: 15px">
-                                <button type="button" class="btn btn-warning btn-lg" ng-click="hints()"><span class="glyphicon glyphicon-fire"/></button></td>
-                        </tr>
-                    </table>
-                    <br/>
-                    <div ng-show="curGame.hints.length > 0">
-                        <p>Фонетические подсказки:</p>
-                        <ul>
-                            <li ng-repeat="hint in curGame.hints">{{hint}}</li>
-                        </ul>
-                    </div>
+                    <form ng-submit="guess(curGuess)">
+                        <h2 class="text-center">{{curGame.code}}</h1>
+                        <input type="text" class="form-control input-lg" autofocus ng-model="curGuess">
+                        <br/>
+                        <h4>{{curGame.message}}</h4>
+                        <br/>
+                        <table>
+                            <tr>
+                                <td width="100%">
+                                    <button type="submit" class="btn btn-lg btn-success btn-block">Отгадать</button></td>
+                                <td style="padding-left: 15px">
+                                    <button type="button" class="btn btn-warning btn-lg" ng-click="hints()"><span class="glyphicon glyphicon-fire"/></button></td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <div ng-show="curGame.hints.length > 0">
+                            <p>Фонетические подсказки:</p>
+                            <ul>
+                                <li ng-repeat="hint in curGame.hints">{{hint}}</li>
+                            </ul>
+                        </div>
+                    </form>
                 </div>
                 <div class="col-sm-6 col-md-8">
                     <h2>Правила</h2>

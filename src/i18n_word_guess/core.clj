@@ -2,7 +2,8 @@
   (:require [i18n-word-guess.run :as run]
             [org.httpkit.server]
             [compojure.api.sweet :refer :all]
-            [ring.util.http-response :refer :all]
+            [ring.util.http-response :refer [ok
+                                             resource-response]]
             [ring.swagger.schema :refer [defmodel]]
             [schema.core :as s]
             [clojure.java.io :as io]))
@@ -20,7 +21,7 @@
   (swagger-docs)
   (with-middleware [wrap-cache-control]
     (GET* "/" []
-         (resource-response "index.html" {:root "public"}))
+          (resource-response "index.html" {:root "public"}))
     (swaggered "i18n-word-guess"
                :description "Слово угадай игра"
                (context "/games" []
@@ -35,15 +36,17 @@
                               :summary  "Получить статус игры по ID"
                               (ok (run/get-game game_id)))
                         (POST* "/guess" []
-                              :summary  "Попробовать угадать"
-                              :body [guess Guess]
-                              (ok (run/guess-game game_id (:word guess)))))
+                               :summary  "Попробовать угадать"
+                               :body [guess Guess]
+                               (ok (run/guess-game game_id (:word guess)))))
                (GET* "/hints" [code]
                      :summary  "Получить подсказку"
                      :query [getHint GetHint]
-                     (ok (run/get-hints code))))))
+                     (ok (run/get-hints code))))
+    ;compojure.api.middleware/public-resource-routes
+    (compojure.route/not-found "<h1>NO.</h1>")))
 
 (defn -main [& args]
   (let [port (or (first args) 3030)]
     (println "Starting on port" port)
-    (org.httpkit.server/run-server app {:port (bigdec port)})))
+    (org.httpkit.server/run-server #'app {:port (bigdec port)})))
