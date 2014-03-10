@@ -1,6 +1,7 @@
 (ns i18n-word-guess.core
   (:gen-class)
-  (:require [i18n-word-guess.run :as run]
+  (:require [i18n-word-guess [run :as run]
+                             [db :as db]]
             [org.httpkit.server]
             [compojure.api.sweet :refer :all]
             [ring.util.http-response :refer [ok
@@ -65,5 +66,6 @@
 
 (defn -main [& args]
   (let [port (or (first args) 3030)]
+    (db/init)
     (println "Starting on port" port)
     (org.httpkit.server/run-server #'app {:port (bigdec port)})))

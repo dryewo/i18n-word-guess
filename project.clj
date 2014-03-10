@@ -9,6 +9,8 @@
                  [metosin/ring-swagger-ui "2.0.10"]
                  [ring-mock "0.1.5"]
                  [com.taoensso/timbre "3.1.2"]
+                 [org.clojure/java.jdbc "0.3.3"]
+                 [postgresql "9.1-901.jdbc4"]
                  [javax.servlet/servlet-api "2.5"]]
   :main ^:skip-aot i18n-word-guess.core
   :min-lein-version "2.0.0"
