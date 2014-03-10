@@ -38,25 +38,26 @@
           (resource-response "index.html" {:root "public"}))
     (swaggered "i18n-word-guess"
                :description "Слово угадай игра"
-               (context "/games" []
-                        (GET* "/new" []
-                              :summary  "Создать новую игру"
-                              (ok (run/new-game!)))
-                        #_(GET* "/all" []
-                              :summary  "Получить статусы всех игр"
-                              (ok (run/get-all-games))))
-               (context "/game/:game_id" [game_id]
-                        (GET* "/history" []
-                              :summary  "Получить журнал игры по ID"
-                              (ok (run/get-game-history (bigdec game_id))))
-                        (POST* "/guess" []
-                               :summary  "Попробовать угадать"
-                               :body [guess Guess]
-                               (ok (run/guess-game! (bigdec game_id) (:word guess)))))
-               (GET* "/hints" [code]
-                     :summary  "Получить подсказку"
-                     :query [getHint GetHint]
-                     (ok (run/get-hints code))))
+               (context "/rest" {sss :remote-addr}
+                        (context "/games" []
+                                 (GET* "/new" []
+                                       :summary  "Создать новую игру"
+                                       (ok (run/new-game! {:session sss})))
+                                 #_(GET* "/all" []
+                                         :summary  "Получить статусы всех игр"
+                                         (ok (run/get-all-games))))
+                        (context "/game/:game_id" [game_id]
+                                 (GET* "/history" []
+                                       :summary  "Получить журнал игры по ID"
+                                       (ok (run/get-game-history (bigdec game_id))))
+                                 (POST* "/guess" []
+                                        :summary  "Попробовать угадать"
+                                        :body [guess Guess]
+                                        (ok (run/guess-game! (bigdec game_id) (:word guess) {:session sss}))))
+                        (GET* "/hints" [code]
+                              :summary  "Получить подсказку"
+                              :query [getHint GetHint]
+                              (ok (run/get-hints code)))))
     compojure.api.middleware/public-resource-routes
     (compojure.route/not-found "<h1>NO.</h1>")))
 

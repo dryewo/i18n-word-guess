@@ -46,7 +46,7 @@
                         return;
                     $scope.guessLoading = true;
                     //setTimeout(function () {
-                    $http.post('/game/' + $scope.curGame.game_id + '/guess', {"word": word})
+                    $http.post('/rest/game/' + $scope.curGame.game_id + '/guess', {"word": word})
                         .success(function(data, status, headers, config) {
                             $scope.curGame = data;
                             $scope.curGuess = "";
@@ -63,7 +63,7 @@
                     $scope.curGame.hints = {};
                     $scope.hintsLoading = true;
                     //setTimeout(function () {
-                    $http.get('/hints?code=' + $scope.curGame.code)
+                    $http.get('/rest/hints?code=' + $scope.curGame.code)
                         .success(function(data, status, headers, config) {
                             $scope.curGame.hints = data;
                             $scope.hintsLoading = false;
@@ -77,7 +77,7 @@
 
                 $scope.newGame = function() {
                     $scope.curGuess = "";
-                    $http.get('/games/new')
+                    $http.get('/rest/games/new')
                         .success(function(data, status, headers, config) {
                             $scope.curGame = data;
                         })
