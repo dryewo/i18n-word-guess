@@ -74,7 +74,7 @@
                                                     :mask   mask}
                (not-any? #{lower-guess} all-nouns) {:status :not-in-dict
                                                     :mask   mask}
-               :else (impl/next-step word mask new-guess)))))
+               :else (impl/next-step word mask lower-guess)))))
     (get-game-cur game-id)))
 
 ;(get-game-cur 26)
