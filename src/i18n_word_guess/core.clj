@@ -41,7 +41,7 @@
                (context "/games" []
                         (GET* "/new" []
                               :summary  "Создать новую игру"
-                              (ok (run/new-game)))
+                              (ok (run/new-game!)))
                         (GET* "/all" []
                               :summary  "Получить статусы всех игр"
                               (ok (run/get-all-games))))
@@ -52,7 +52,7 @@
                         (POST* "/guess" []
                                :summary  "Попробовать угадать"
                                :body [guess Guess]
-                               (ok (run/guess-game game_id (:word guess)))))
+                               (ok (run/guess-game! game_id (:word guess)))))
                (GET* "/hints" [code]
                      :summary  "Получить подсказку"
                      :query [getHint GetHint]

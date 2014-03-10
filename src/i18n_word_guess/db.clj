@@ -36,3 +36,6 @@
                          games-ddl
                          steps-ddl)
     (println " done")))
+
+(defn insert-game! [word]
+  (jdbc/insert! conn :games {:word word}))

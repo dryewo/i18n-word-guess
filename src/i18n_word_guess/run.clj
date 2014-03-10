@@ -1,5 +1,6 @@
 (ns i18n-word-guess.run
-  (:require [i18n-word-guess.game :as impl]
+  (:require [i18n-word-guess [game :as impl]
+                             [db :as db]]
             [clojure.java.io :as io]))
 
 ;;-----------------------------------------------------------------------------
@@ -58,13 +59,15 @@
   ([games-snapshot]
    (map #(format-game (key %) (val %)) @games)))
 
-(defn new-game []
-  (let [game-id (gen-game-id)
-        game (impl/create-game (rand-nth questionable-nouns))]
-    (-> (swap! games assoc game-id game)
-        (get-game game-id))))
+(defn new-game! []
+  (let [random-word (rand-nth questionable-nouns)
+        [game-rec] (db/insert-game! random-word)]
+    (let [game-id (:id game-rec)
+          game (impl/create-game random-word)]
+      (-> (swap! games assoc game-id game)
+          (get-game game-id)))))
 
-(defn guess-game [game-id new-guess]
+(defn guess-game! [game-id new-guess]
   (let [lower-guess (clojure.string/lower-case new-guess)]
     (if (some #{lower-guess} all-nouns)
       (-> (swap! games update-in [game-id] impl/step lower-guess)
