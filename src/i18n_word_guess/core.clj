@@ -4,14 +4,10 @@
                              [db :as db]]
             [org.httpkit.server]
             [compojure.api.sweet :refer :all]
-            [ring.util.http-response :refer [ok
-                                             resource-response]]
+            [ring.util.http-response :refer [ok resource-response]]
             [ring.swagger.schema :refer [defmodel]]
             [schema.core :as s]
-            [clojure.java.io :as io]
-            [taoensso.timbre :as log]))
-
-(log/merge-config! {:timestamp-pattern "yyyy-MM-dd HH:mm:ss ZZ"})
+            [clojure.java.io :as io]))
 
 (defmodel Guess   {:word String})
 (defmodel GetHint {:code String})
@@ -24,12 +20,12 @@
 (defn wrap-log [handler]
   (fn [request]
     (let [req-id (apply str (take 4 (repeatedly #(rand-nth "ABCDEF0123456789"))))]
-      (log/info req-id
+      (println req-id
                 (->> (:request-method request) name clojure.string/upper-case)
                 (:uri request)
                 (:params request))
       (let [response (handler request)]
-        (log/info req-id
+        (println req-id
                   (:status response)
                   (:body response))
         response))))

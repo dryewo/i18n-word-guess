@@ -1,7 +1,6 @@
 (ns i18n-word-guess.run
   (:require [i18n-word-guess.game :as impl]
-            [clojure.java.io :as io]
-            [taoensso.timbre :as log]))
+            [clojure.java.io :as io]))
 
 ;;-----------------------------------------------------------------------------
 ;; ID generation
@@ -43,7 +42,6 @@
 
 (defn- format-game [id game]
   (let [last-step (last game)]
-    (log/info (:word last-step))
     (merge (select-keys last-step [:code :status :timestamp])
            {:id id
             :message (game-message last-step)})))
