@@ -36,3 +36,9 @@
 (defn get-game-history [id]
   (->> (jdbc/query conn [game-steps-select id])
        (map status->kw)))
+
+(defn get-steps-since [timestamp]
+  (let [utc-time-format (doto (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm:ss.SSS") (.setTimeZone (java.util.TimeZone/getTimeZone "UTC")))
+        utc-timestamp (.format utc-time-format timestamp)]
+    (jdbc/query conn ["SELECT * FROM game_steps WHERE creation_date >= to_timestamp(?, 'YYYY-MM-DD HH24:MI:SS.MS') ORDER BY creation_date DESC"
+                      utc-timestamp])))

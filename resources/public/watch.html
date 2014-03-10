@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Другие угадывают смотри</title>
+        <meta charset="utf-8">
+        <meta http-equiv="cache-control" content="no-cache" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" media="screen"
+            href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
+
+        <script type="text/javascript"
+                src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+        <script type="text/javascript"
+                src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript"
+                src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"></script>
+
+        <script type="text/javascript">
+
+            var mainModule = angular.module('main', []);
+            
+            mainModule.controller('WatchCtrl', function($scope) {
+                $scope.events = [];
+
+                var on_message = function(event) {
+                    $scope.$apply(function() {
+                        var evts = JSON.parse(event.data);
+                        evts.forEach(function(e) {
+                            $scope.events.unshift(e);
+                        });
+                        while ($scope.events.length > 50)
+                            $scope.events.pop();
+                    });
+                }
+
+                var open_socket = function() {
+                    var REOPEN_TIMEOUT = 5000;
+                    socket = new WebSocket("ws://localhost:3030/monitor");
+                    socket.onmessage = on_message;
+                    socket.onclose = function(event) {
+                        console.log("Retrying in " + REOPEN_TIMEOUT + " ms");
+                        setTimeout(function() { open_socket(); }, REOPEN_TIMEOUT);
+                    }
+                }
+
+                open_socket();
+            });
+
+        </script>
+        <style type="text/css">
+            .footer {
+                padding-top: 20px;
+                padding-bottom: 30px;
+                margin-top: 40px;
+                border-top: 1px solid #eee;
+                color: #888;
+                font-size: smaller;
+            }
+        </style>
+    </head>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-10143677-2', 'i18n-word-guess.herokuapp.com');
+  ga('send', 'pageview');
+
+</script>
+    <body ng-app="main">
+        <div class="container" ng-controller="WatchCtrl">
+            <div class="row">
+                <h2>Другие угадывают смотри</h2>
+            </div>
+            <div class="row">
+                <!--<p>Всего других: {{watcherCount}}</p>-->
+                <table class="table table-condensed">
+                    <thead>
+                    	<tr>
+                    		<th>Время</th>
+                    		<th>Код</th>
+                    		<th>Догадка</th>
+                    		<th>Статус</th>
+                    	</tr>
+                    </thead>
+                    <tbody>
+                    	<tr ng-repeat="evt in events">
+                    		<td>{{evt.creation_date}}</td>
+                    		<td>{{evt.code}}</td>
+                    		<td>{{evt.guess}}</td>
+                    		<td>{{evt.status}}</td>
+                    	</tr>
+                    </tbody>
+                </table>
+                <!--<ul>
+                    <li ng-repeat="evt in events">{{evt.guess}}</li>
+                </ul>-->
+            </div>
+
+            <div class="footer">
+                <p>&copy; <a href="https://github.com/dryewo">Dmitry Balakhonskiy</a> 2014</p>
+            </div>
+        </div>
+       
+    </body>
+</html>

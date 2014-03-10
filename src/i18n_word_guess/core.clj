@@ -1,16 +1,14 @@
 (ns i18n-word-guess.core
   (:gen-class)
   (:require [i18n-word-guess [run :as run]
-                             [db :as db]]
+                             [db :as db]
+                             [monitor :as monitor]]
             [org.httpkit.server]
             [compojure.api.sweet :refer :all]
             [ring.util.http-response :refer [ok resource-response]]
             [ring.swagger.schema :refer [defmodel]]
-            [schema.core :as s]
+            #_[schema.core :as s]
             [clojure.java.io :as io]))
-
-(defmodel Guess   {:word String})
-(defmodel GetHint {:code String})
 
 (defn wrap-cache-control [handler]
   (fn [request]
@@ -30,12 +28,16 @@
                   (:body response))
         response))))
 
+(defmodel Guess   {:word String})
+(defmodel GetHint {:code String})
+
 (defapi app
   (swagger-ui "/api")
   (swagger-docs)
   (with-middleware [wrap-log wrap-cache-control]
-    (GET* "/" []
-          (resource-response "index.html" {:root "public"}))
+    (GET* "/"        [] (resource-response "index.html" {:root "public"}))
+    (GET* "/watch"   [] (resource-response "watch.html" {:root "public"}))
+    (GET* "/monitor" [] monitor/add-ws-connection)
     (swaggered "i18n-word-guess"
                :description "Слово угадай игра"
                (context "/rest" {sss :remote-addr}
@@ -64,4 +66,8 @@
 (defn -main [& args]
   (let [port (or (first args) 3030)]
     (println "Starting on port" port)
-    (org.httpkit.server/run-server #'app {:port (bigdec port)})))
+    (org.httpkit.server/run-server #'app {:port (bigdec port)})
+    (monitor/start-monitor)))
+
+;(def stop-server (-main))
+;(stop-server)

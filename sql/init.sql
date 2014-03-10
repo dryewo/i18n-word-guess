@@ -7,7 +7,7 @@ CREATE TABLE games
 (
   id serial NOT NULL,
   word character varying NOT NULL,
-  creation_date timestamp without time zone NOT NULL DEFAULT now(),
+  creation_date timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT games_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -22,7 +22,7 @@ CREATE TABLE steps
   guess character varying,
   mask character varying,
   status character varying,
-  creation_date timestamp without time zone NOT NULL DEFAULT now(),
+  creation_date timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT steps_pkey PRIMARY KEY (id)
 )
 WITH (
