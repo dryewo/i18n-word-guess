@@ -42,17 +42,17 @@
                         (GET* "/new" []
                               :summary  "Создать новую игру"
                               (ok (run/new-game!)))
-                        (GET* "/all" []
+                        #_(GET* "/all" []
                               :summary  "Получить статусы всех игр"
                               (ok (run/get-all-games))))
                (context "/game/:game_id" [game_id]
-                        (GET* "/" []
-                              :summary  "Получить статус игры по ID"
-                              (ok (run/get-game game_id)))
+                        (GET* "/history" []
+                              :summary  "Получить журнал игры по ID"
+                              (ok (run/get-game-history (bigdec game_id))))
                         (POST* "/guess" []
                                :summary  "Попробовать угадать"
                                :body [guess Guess]
-                               (ok (run/guess-game! game_id (:word guess)))))
+                               (ok (run/guess-game! (bigdec game_id) (:word guess)))))
                (GET* "/hints" [code]
                      :summary  "Получить подсказку"
                      :query [getHint GetHint]
@@ -62,6 +62,5 @@
 
 (defn -main [& args]
   (let [port (or (first args) 3030)]
-    (db/init)
     (println "Starting on port" port)
     (org.httpkit.server/run-server #'app {:port (bigdec port)})))

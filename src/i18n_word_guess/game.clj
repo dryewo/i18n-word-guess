@@ -5,7 +5,7 @@
                    (clojure.string/replace code #"\d+" #(str "\\D{" % "}"))
                    "$")))
 
-(defn- check-guess [code guess]
+(defn- check-guess-by-code [code guess]
   (let [prev-re (code->re code)]
     (re-seq prev-re guess)))
 
@@ -15,8 +15,11 @@
 (defn- transparent-mask [word]
   (apply str (repeat (count word) \_)))
 
+(defn- count-stars [mask]
+  (count (filter #{\*} mask)))
+
 (defn- transparent? [mask]
-  (not-any? #{\*} mask))
+  (zero? (count-stars mask)))
 
 (defn- set-at [string idx chr]
   (apply str (assoc (vec string) idx chr)))
@@ -29,7 +32,7 @@
       mask
       (set-at mask edge \_))))
 
-(defn- encode [mask word]
+(defn encode [mask word]
   {:pre [(= (count mask) (count word))]}
   (letfn [(apply-mask [m w]
                       (apply str (map #(if (= %1 \*) \* %2) m w)))
@@ -39,40 +42,22 @@
          (apply-mask mask)
          collapse-stars)))
 
-(defn create-game [word]
-  (let [mask (->> (opaque-mask word)
-                  (reveal :front)
-                  (reveal :back))]
-    [{:timestamp (java.util.Date.)
-      :word      word
-      :mask      mask
-      :code      (encode mask word)
-      :status    :start}]))
+(defn initial-mask [word]
+  (->> (opaque-mask word)
+       (reveal :front)
+       (reveal :back)))
 
-(defn step
-  ([game new-guess]
-   (step game new-guess (rand-nth [:front :back])))
-  ([game new-guess reveal-side]
-   (let [{:keys [word mask code status] :as prev-step} (last game)]
-     (conj game
-           (merge {:word      word
-                   :guess     new-guess
-                   :timestamp (java.util.Date.)}
-                  (cond
-                   (= new-guess word) {:status (if (#{:win :over} status) :over :win)
-                                       :mask   (transparent-mask word)
-                                       :code   word}
-                   (some #{new-guess} (map :guess game)) {:status :repeat
-                                                          :mask   mask
-                                                          :code   code}
-                   (check-guess code new-guess) (let [new-mask (reveal reveal-side mask)
-                                                      new-mask (if (transparent? new-mask) mask new-mask)]
-                                                  {:status :ok
-                                                   :mask   new-mask
-                                                   :code   (encode new-mask word)})
-                   :else {:status :no-match
-                          :mask   mask
-                          :code   code}))))))
+(defn next-step [word mask new-guess
+                 & {:keys [reveal-side] :or {reveal-side (rand-nth [:front :back])}}]
+  (let [code (encode mask word)]
+    (cond
+     (= new-guess word) {:status :win
+                         :mask   (transparent-mask word)}
+     (check-guess-by-code code new-guess) {:status :ok
+                                           :mask   (let [try-mask (reveal reveal-side mask)]
+                                                     (if (transparent? try-mask) mask try-mask))}
+     :else {:status :no-match
+            :mask   mask})))
 
 ;;-----------------------------------------------------------------------------
 ;; Hints

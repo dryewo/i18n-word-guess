@@ -46,7 +46,7 @@
                         return;
                     $scope.guessLoading = true;
                     //setTimeout(function () {
-                    $http.post('/game/' + $scope.curGame.id + '/guess', {"word": word})
+                    $http.post('/game/' + $scope.curGame.game_id + '/guess', {"word": word})
                         .success(function(data, status, headers, config) {
                             $scope.curGame = data;
                             $scope.curGuess = "";

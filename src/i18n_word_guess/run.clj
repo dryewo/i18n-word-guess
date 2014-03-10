@@ -4,14 +4,6 @@
             [clojure.java.io :as io]))
 
 ;;-----------------------------------------------------------------------------
-;; ID generation
-
-(def game-id-seq (atom 0))
-
-(defn gen-game-id []
-  (str (swap! game-id-seq inc)))
-
-;;-----------------------------------------------------------------------------
 ;; Dictionary
 
 (defn- load-words [file-name]
@@ -29,8 +21,6 @@
 ;;-----------------------------------------------------------------------------
 ;; Game routine
 
-(def games (atom {}))
-
 (defn- game-message [{:keys [status guess]}]
   (case status
     :start "Начинайте"
@@ -38,42 +28,59 @@
     :win "Вы победили"
     :repeat (str "Вариант \"" guess "\" уже был")
     :no-match (str "Вариант \"" guess "\" не подходит")
-    :over "Игра уже закончена"
+;    :over "Игра уже закончена"
+    :not-in-dict  (str "Слова \"" guess "\" нет в словаре")
     ""))
 
-(defn- format-game [id game]
-  (let [last-step (last game)]
-    (merge (select-keys last-step [:code :status :timestamp])
-           {:id id
-            :message (game-message last-step)})))
+(defn- format-step [{:keys [word mask] :as step}]
+  (merge (select-keys step [:game_id
+                            :guess
+                            :mask
+                            :status
+                            :creation_date])
+         {:code (impl/encode mask word)
+          :message (game-message step)}))
 
-(defn get-game
-  ([id]
-   (get-game @games id))
-  ([games-snapshot id]
-   (format-game id (games-snapshot id))))
+(defn- get-game-cur [id]
+  (->> (db/get-game-cur id)
+       format-step))
 
-(defn get-all-games
-  ([]
-   (get-all-games @games))
-  ([games-snapshot]
-   (map #(format-game (key %) (val %)) @games)))
+(defn get-game-history [id]
+  (->> (db/get-game-history id)
+       (map format-step)))
 
-(defn new-game! []
-  (let [random-word (rand-nth questionable-nouns)
-        [game-rec] (db/insert-game! random-word)]
-    (let [game-id (:id game-rec)
-          game (impl/create-game random-word)]
-      (-> (swap! games assoc game-id game)
-          (get-game game-id)))))
+(defn new-game! [& [{:keys [session] :as ctx}]]
+  (let [word               (rand-nth questionable-nouns)
+        [game-rec]         (db/insert-game! {:word word})
+        game-id            (:id game-rec)
+        [initial-step-rec] (db/insert-step! {:game_id game-id
+                                             :session session
+                                             :mask    (impl/initial-mask word)
+                                             :status  :start})]
+    (get-game-cur game-id)))
 
-(defn guess-game! [game-id new-guess]
-  (let [lower-guess (clojure.string/lower-case new-guess)]
-    (if (some #{lower-guess} all-nouns)
-      (-> (swap! games update-in [game-id] impl/step lower-guess)
-          (get-game game-id))
-      (merge (get-game @games game-id)
-             {:message (str "Слова \"" new-guess "\" нет в словаре")}))))
+(defn guess-game! [game-id new-guess
+                   & [{:keys [session] :as ctx}]]
+  (let [lower-guess (clojure.string/lower-case new-guess)
+        prev-guesses (map :guess (db/get-game-history game-id))
+        {:keys [word mask status]} (db/get-game-cur game-id)]
+    (when-not (= (keyword status) :win)
+      (db/insert-step!
+       (merge {:game_id   game-id
+               :session   session
+               :guess     new-guess}
+              (cond
+               (some #{lower-guess} prev-guesses)  {:status :repeat
+                                                    :mask   mask}
+               (not-any? #{lower-guess} all-nouns) {:status :not-in-dict
+                                                    :mask   mask}
+               :else (impl/next-step word mask new-guess)))))
+    (get-game-cur game-id)))
+
+;(get-game-cur 26)
+;(new-game! {:session "65453"})
+;(guess-game! 29 "сифен")
+;(get-game-history 29)
 
 (defn get-hints [code]
   (impl/code-hints all-nouns code))
