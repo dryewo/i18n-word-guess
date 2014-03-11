@@ -66,8 +66,7 @@
 (defn -main [& args]
   (let [port (or (first args) 3030)]
     (println "Starting on port" port)
-    (org.httpkit.server/run-server #'app {:port (bigdec port)})
-    (monitor/start-monitor)))
+    (org.httpkit.server/run-server #'app {:port (bigdec port)})))
 
 ;(def stop-server (-main))
 ;(stop-server)

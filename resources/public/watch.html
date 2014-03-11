@@ -23,13 +23,13 @@
             
             mainModule.controller('WatchCtrl', function($scope) {
                 $scope.events = [];
+                $scope.watcherCount = 0;
 
                 var on_message = function(event) {
                     $scope.$apply(function() {
-                        var evts = JSON.parse(event.data);
-                        evts.forEach(function(e) {
-                            $scope.events.unshift(e);
-                        });
+                        var evt = JSON.parse(event.data);
+                        $scope.watcherCount = evt.watchers;
+                        $scope.events.unshift(evt);
                         while ($scope.events.length > 50)
                             $scope.events.pop();
                     });
@@ -76,7 +76,7 @@
                 <h2>Другие угадывают смотри</h2>
             </div>
             <div class="row">
-                <!--<p>Всего других: {{watcherCount}}</p>-->
+                <p>Всего других: {{watcherCount}}</p>
                 <table class="table table-condensed">
                     <thead>
                     	<tr>
@@ -88,10 +88,10 @@
                     </thead>
                     <tbody>
                     	<tr ng-repeat="evt in events">
-                    		<td>{{evt.creation_date}}</td>
+                    		<td>{{evt.timestamp}}</td>
                     		<td>{{evt.code}}</td>
                     		<td>{{evt.guess}}</td>
-                    		<td>{{evt.status}}</td>
+                    		<td>{{evt.message}}</td>
                     	</tr>
                     </tbody>
                 </table>

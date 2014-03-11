@@ -1,6 +1,7 @@
 (ns i18n-word-guess.run
   (:require [i18n-word-guess [game :as impl]
-                             [db :as db]]
+                             [db :as db]
+                             [monitor :as monitor]]
             [clojure.java.io :as io]))
 
 ;;-----------------------------------------------------------------------------
@@ -75,7 +76,12 @@
                (not-any? #{lower-guess} all-nouns) {:status :not-in-dict
                                                     :mask   mask}
                :else (impl/next-step word mask lower-guess)))))
-    (get-game-cur game-id)))
+    (let [res (get-game-cur game-id)]
+      (monitor/notify-watchers {:timestamp (java.util.Date.)
+                                :code (impl/encode mask word)
+                                :guess new-guess
+                                :message (:message res)})
+      res)))
 
 ;(get-game-cur 26)
 ;(new-game! {:session "65453"})

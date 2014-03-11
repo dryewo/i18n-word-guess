@@ -3,21 +3,27 @@
             [org.httpkit.server :refer [with-channel on-close send!]]
             [cheshire.core :as json]))
 
-(def clients (atom {}))
+(def watchers (atom {}))
 
 (defn add-ws-connection [request]
   (with-channel request chan
-    (swap! clients assoc chan true)
+    (swap! watchers assoc chan true)
     (println chan " connected")
     (on-close chan (fn [status]
-                    (swap! clients dissoc chan)
+                    (swap! watchers dissoc chan)
                     (println chan " disconnected. status: " status)))))
 
-(defn prepare-step [{:keys [mask word] :as step}]
+(defn notify-watchers [data]
+  (doseq [watcher @watchers]
+    (send! (key watcher) (json/generate-string (merge data
+                                                      {:watchers (count @watchers)}))
+           false)))
+
+#_(defn prepare-step [{:keys [mask word] :as step}]
   (-> step
       (merge {:code (impl/encode mask word)})))
 
-(defn start-monitor []
+#_(defn start-monitor []
   (future (loop []
             (let [loop-start (java.util.Date.)]
               (Thread/sleep 5000)
@@ -26,7 +32,6 @@
                   (send! (key client) (json/generate-string new-steps)
                          false))))
             (recur))))
-
 
 ;(def fut (start-monitor))
 ;(future-cancel fut)
