@@ -5,7 +5,7 @@
                              [monitor :as monitor]]
             [org.httpkit.server]
             [compojure.api.sweet :refer :all]
-            [ring.util.http-response :refer [ok resource-response]]
+            [ring.util.http-response :refer [ok created resource-response]]
             [ring.swagger.schema :refer [defmodel]]
             #_[schema.core :as s]
             [clojure.java.io :as io]))
@@ -45,7 +45,7 @@
                         (context "/games" []
                                  (GET* "/new" []
                                        :summary  "Создать новую игру"
-                                       (ok (run/new-game! {:session sss})))
+                                       (created (run/new-game! {:session sss})))
                                  #_(GET* "/all" []
                                          :summary  "Получить статусы всех игр"
                                          (ok (run/get-all-games))))
@@ -69,5 +69,5 @@
     (println "Starting on port" port)
     (org.httpkit.server/run-server #'app {:port (bigdec port)})))
 
-;(def stop-server (-main))
-;(stop-server)
+(def stop-server (-main))
+(stop-server)
