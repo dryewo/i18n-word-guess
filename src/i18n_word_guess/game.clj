@@ -42,6 +42,13 @@
          (apply-mask mask)
          collapse-stars)))
 
+(defn encode2 [mask word]
+  (->> (map #(if (= %1 \_) %2 \_) mask word)
+       (partition-by identity)
+       (map #(if (= (first %) \_) [\space (interpose \space %) \space] %))
+       flatten
+       (apply str)))
+
 (defn initial-mask [word]
   (->> (opaque-mask word)
        (reveal :front)

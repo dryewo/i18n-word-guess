@@ -27,6 +27,7 @@
                 $scope.curGuess = "";
                 $scope.guessLoading = false;
                 $scope.hintsLoading = false;
+                $scope.simpleMode = false;
                 
                 $scope.isGameOver = function() {
                     with ($scope) {
@@ -136,18 +137,16 @@
         <div class="container" ng-controller="GameCtrl">
             <div class="row">
                 <div class="col-sm-6 col-md-4">
-                    <h2 class="text-center">Слово угадай игра</h2>
+                    <h2>Слово угадай игра</h2>
                 </div>
             </div>
             <div class="row">
                 <div class="col-sm-6 col-md-4">
                     <form ng-submit="submit()">
-                        <h2 class="text-center">{{curGame.code}}</h2>
+                        <h2>{{simpleMode ? curGame.code2 : curGame.code}}</h2>
                         <input type="text" class="form-control input-lg" autofocus ng-model="curGuess"
                             ng-class="{'input-loading': guessLoading}"/>
-                        <br/>
                         <h4>{{curGame.message}}</h4>
-                        <br/>
                         <table>
                             <tr>
                                 <td width="100%">
@@ -156,7 +155,12 @@
                                     <button type="button" class="btn btn-warning btn-lg" ng-click="hints()"><span class="glyphicon glyphicon-fire"/></button></td>
                             </tr>
                         </table>
-                        <br/>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" value="" ng-model="simpleMode"/>
+                                Простой режим
+                            </label>
+                        </div>
                         <img src="assets/loading.gif" alt="loading..." ng-show="hintsLoading"/>
                         <div ng-show="curGame.hints.length > 0">
                             <p>Фонетические подсказки:</p>

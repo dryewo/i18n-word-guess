@@ -39,7 +39,8 @@
                             :mask
                             :status
                             :creation_date])
-         {:code (impl/encode mask word)
+         {:code    (impl/encode  mask word)
+          :code2   (impl/encode2 mask word)
           :message (game-message step)}))
 
 (defn- get-game-cur [id]
@@ -78,9 +79,10 @@
                :else (impl/next-step word mask lower-guess)))))
     (let [res (get-game-cur game-id)]
       (monitor/notify-watchers {:timestamp (java.util.Date.)
-                                :code (impl/encode mask word)
-                                :guess new-guess
-                                :message (:message res)})
+                                :code      (impl/encode mask word)
+                                :code2     (impl/encode2 mask word)
+                                :guess     new-guess
+                                :message   (:message res)})
       res)))
 
 ;(get-game-cur 26)

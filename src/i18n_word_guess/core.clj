@@ -69,5 +69,5 @@
     (println "Starting on port" port)
     (org.httpkit.server/run-server #'app {:port (bigdec port)})))
 
-(def stop-server (-main))
-(stop-server)
+;(def stop-server (-main))
+;(stop-server)

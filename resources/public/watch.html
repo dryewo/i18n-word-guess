@@ -82,20 +82,22 @@
                 <p>Всего играющих {{playerCount}}, наблюдающих {{watcherCount}}</p>
                 <table class="table table-condensed">
                     <thead>
-                    	<tr>
-                    		<th>Время</th>
-                    		<th>Код</th>
-                    		<th>Догадка</th>
-                    		<th>Статус</th>
-                    	</tr>
+                        <tr>
+                            <th>Время</th>
+                            <th>Код</th>
+                            <th>Код2</th>
+                            <th>Догадка</th>
+                            <th>Статус</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    	<tr ng-repeat="evt in events">
-                    		<td>{{evt.timestamp}}</td>
-                    		<td>{{evt.code}}</td>
-                    		<td>{{evt.guess}}</td>
-                    		<td>{{evt.message}}</td>
-                    	</tr>
+                        <tr ng-repeat="evt in events">
+                            <td>{{evt.timestamp}}</td>
+                            <td>{{evt.code}}</td>
+                            <td>{{evt.code2}}</td>
+                            <td>{{evt.guess}}</td>
+                            <td>{{evt.message}}</td>
+                        </tr>
                     </tbody>
                 </table>
                 <!--<ul>
