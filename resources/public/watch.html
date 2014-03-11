@@ -37,7 +37,7 @@
 
                 var open_socket = function() {
                     var REOPEN_TIMEOUT = 5000;
-                    socket = new WebSocket("ws://localhost:3030/monitor");
+                    socket = new WebSocket("ws://" + window.location.host + "/monitor");
                     socket.onmessage = on_message;
                     socket.onclose = function(event) {
                         console.log("Retrying in " + REOPEN_TIMEOUT + " ms");
