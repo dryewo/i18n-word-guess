@@ -20,15 +20,18 @@
         <script type="text/javascript">
 
             var mainModule = angular.module('main', []);
+            var socket;
             
             mainModule.controller('WatchCtrl', function($scope) {
                 $scope.events = [];
                 $scope.watcherCount = 0;
+                $scope.playerCount = 0;
 
                 var on_message = function(event) {
                     $scope.$apply(function() {
                         var evt = JSON.parse(event.data);
                         $scope.watcherCount = evt.watchers;
+                        $scope.playerCount = evt.players;
                         $scope.events.unshift(evt);
                         while ($scope.events.length > 50)
                             $scope.events.pop();
@@ -76,7 +79,7 @@
                 <h2>Другие угадывают смотри</h2>
             </div>
             <div class="row">
-                <p>Всего других: {{watcherCount}}</p>
+                <p>Всего игроков {{playerCount}}, смотретелей {{watcherCount}}</p>
                 <table class="table table-condensed">
                     <thead>
                     	<tr>

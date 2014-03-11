@@ -4,19 +4,28 @@
             [cheshire.core :as json]))
 
 (def watchers (atom {}))
+(def players (atom {}))
 
-(defn add-ws-connection [request]
+
+(defn- add-ws-connection [store request]
   (with-channel request chan
-    (swap! watchers assoc chan true)
+    (swap! store assoc chan true)
     (println chan " connected")
     (on-close chan (fn [status]
-                    (swap! watchers dissoc chan)
+                    (swap! store dissoc chan)
                     (println chan " disconnected. status: " status)))))
+
+(defn add-watcher-connection [request]
+  (add-ws-connection watchers request))
+
+(defn add-player-connection [request]
+  (add-ws-connection players request))
 
 (defn notify-watchers [data]
   (doseq [watcher @watchers]
     (send! (key watcher) (json/generate-string (merge data
-                                                      {:watchers (count @watchers)}))
+                                                      {:watchers (count @watchers)
+                                                       :players (count @players)}))
            false)))
 
 #_(defn prepare-step [{:keys [mask word] :as step}]

@@ -37,7 +37,8 @@
   (with-middleware [wrap-log wrap-cache-control]
     (GET* "/"        [] (resource-response "index.html" {:root "public"}))
     (GET* "/watch"   [] (resource-response "watch.html" {:root "public"}))
-    (GET* "/monitor" [] monitor/add-ws-connection)
+    (GET* "/monitor" [] monitor/add-watcher-connection)
+    (GET* "/play"    [] monitor/add-player-connection)
     (swaggered "i18n-word-guess"
                :description "Слово угадай игра"
                (context "/rest" {sss :remote-addr}

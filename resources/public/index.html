@@ -20,6 +20,7 @@
         <script type="text/javascript">
 
             var mainModule = angular.module('main', []);
+            var socket;
 
             mainModule.controller('GameCtrl', ['$scope', '$http', function($scope, $http) {
                 $scope.curGame = {};
@@ -85,6 +86,23 @@
                         .error(function(data, status, headers, config) {
                             console.log(status + ': ' + data);});
                 }
+
+                var on_message = function(event) {
+                    $scope.$apply(function() {
+                    });
+                }
+
+                var open_socket = function() {
+                    var REOPEN_TIMEOUT = 5000;
+                    socket = new WebSocket("ws://" + window.location.host + "/play");
+                    socket.onmessage = on_message;
+                    socket.onclose = function(event) {
+                        console.log("Retrying in " + REOPEN_TIMEOUT + " ms");
+                        setTimeout(function() { open_socket(); }, REOPEN_TIMEOUT);
+                    }
+                }
+
+                open_socket();
 
                 $scope.newGame();
             }]);
